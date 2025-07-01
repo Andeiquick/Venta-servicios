@@ -1,1 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantillas Pro - Tu Tienda de Plantillas</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Color de fondo suave */
+        }
+        .hero-bg {
+            background-color: #111827;
+            background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+        .modal.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal.is-open .modal-content {
+            transform: translateY(0) scale(1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
 
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-teal-600">PlantillasPro</a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#inicio" class="text-gray-600 hover:text-teal-600 transition duration-300">Inicio</a>
+                <a href="#plantillas" class="text-gray-600 hover:text-teal-600 transition duration-300">Plantillas</a>
+                <a href="#nosotros" class="text-gray-600 hover:text-teal-600 transition duration-300">Nosotros</a>
+                <a href="#" class="bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-600 transition duration-300">Contacto</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#inicio" class="block py-2 text-gray-600 hover:text-teal-600">Inicio</a>
+            <a href="#plantillas" class="block py-2 text-gray-600 hover:text-teal-600">Plantillas</a>
+            <a href="#nosotros" class="block py-2 text-gray-600 hover:text-teal-600">Nosotros</a>
+            <a href="#" class="block mt-2 bg-teal-500 text-white text-center py-2 px-4 rounded-lg hover:bg-teal-600">Contacto</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="inicio" class="hero-bg text-white py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">Diseños Profesionales al Instante</h1>
+                <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto">Acelera tu flujo de trabajo con nuestra colección de plantillas premium, listas para usar y personalizar.</p>
+                <a href="#plantillas" class="bg-teal-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-600 transition duration-300 text-lg">Explorar Plantillas</a>
+            </div>
+        </section>
+
+        <!-- Templates Section -->
+        <section id="plantillas" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Nuestro Catálogo</h2>
+                <div id="template-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <!-- Las plantillas se insertarán aquí dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="nosotros" class="bg-white py-16 md:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">¿Quiénes Somos?</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    En PlantillasPro, nos dedicamos a crear herramientas de diseño que empoderan a creativos, desarrolladores y emprendedores. Creemos que un buen diseño debe ser accesible para todos, y nuestras plantillas están construidas con esa filosofía en mente: son potentes, flexibles y fáciles de usar.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 PlantillasPro. Todos los derechos reservados.</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="#" class="text-gray-400 hover:text-white">Facebook</a>
+                <a href="#" class="text-gray-400 hover:text-white">Twitter</a>
+                <a href="#" class="text-gray-400 hover:text-white">Instagram</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div id="template-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 invisible">
+        <div id="modal-content" class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden transform -translate-y-10 scale-95">
+            <!-- Modal content will be populated by JS -->
+        </div>
+    </div>
+
+    <script>
+        // --- Base de datos de plantillas (simulada) ---
+        const templates = [
+            {
+                id: 1,
+                name: 'Plantilla Corporativa "Nexus"',
+                category: 'Sitio Web',
+                price: '49.99',
+                description: 'Una plantilla elegante y moderna perfecta para empresas de tecnología, startups y agencias. Totalmente responsiva y fácil de personalizar.',
+                imageUrl: 'https://placehold.co/600x400/16a34a/ffffff?text=Nexus'
+            },
+            {
+                id: 2,
+                name: 'Plantilla de E-commerce "Orion"',
+                category: 'Tienda Online',
+                price: '79.99',
+                description: 'Impulsa tus ventas con Orion. Un diseño limpio, centrado en el producto y optimizado para la conversión. Incluye carrito de compras y pasarela de pago.',
+                imageUrl: 'https://placehold.co/600x400/0ea5e9/ffffff?text=Orion'
+            },
+            {
+                id: 3,
+                name: 'Plantilla de Portfolio "Crea"',
+                category: 'Portfolio',
+                price: '39.99',
+                description: 'Muestra tu trabajo con estilo. Crea es una plantilla minimalista ideal para fotógrafos, diseñadores y artistas visuales.',
+                imageUrl: 'https://placehold.co/600x400/6d28d9/ffffff?text=Crea'
+            },
+            {
+                id: 4,
+                name: 'Plantilla de Blog "Narrador"',
+                category: 'Blog',
+                price: '29.99',
+                description: 'Engancha a tus lectores con un diseño enfocado en la legibilidad y la experiencia de usuario. Perfecta para bloggers de cualquier nicho.',
+                imageUrl: 'https://placehold.co/600x400/db2777/ffffff?text=Narrador'
+            },
+            {
+                id: 5,
+                name: 'Plantilla para App "Momentum"',
+                category: 'Landing Page',
+                price: '34.99',
+                description: 'Una landing page de alta conversión para promocionar tu aplicación móvil. Destaca las características y consigue más descargas.',
+                imageUrl: 'https://placehold.co/600x400/ea580c/ffffff?text=Momentum'
+            },
+            {
+                id: 6,
+                name: 'Plantilla de Restaurante "Sabor"',
+                category: 'Sitio Web',
+                price: '45.00',
+                description: 'Presenta tu menú, acepta reservas y atrae a más clientes con esta plantilla diseñada específicamente para restaurantes y cafés.',
+                imageUrl: 'https://placehold.co/600x400/ca8a04/ffffff?text=Sabor'
+            },
+            {
+                id: 7,
+                name: 'Plantilla para Dashboard "AdminPro"',
+                category: 'Dashboard',
+                price: '59.99',
+                description: 'Un completo panel de administración con gráficos, tablas y componentes de UI para gestionar tu aplicación web de forma eficiente.',
+                imageUrl: 'https://placehold.co/600x400/475569/ffffff?text=AdminPro'
+            },
+            {
+                id: 8,
+                name: 'Plantilla para Inmobiliaria "Hogar"',
+                category: 'Sitio Web',
+                price: '55.00',
+                description: 'Diseño profesional para agencias inmobiliarias. Muestra propiedades con galerías de imágenes, mapas y formularios de contacto.',
+                imageUrl: 'https://placehold.co/600x400/059669/ffffff?text=Hogar'
+            },
+        ];
+
+        // --- Lógica de la aplicación ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const templateGrid = document.getElementById('template-grid');
+            const modal = document.getElementById('template-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            // Función para renderizar las plantillas en la cuadrícula
+            const renderTemplates = () => {
+                templateGrid.innerHTML = ''; // Limpiar la cuadrícula
+                templates.forEach(template => {
+                    const templateCard = `
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer group" data-id="${template.id}">
+                            <div class="relative">
+                                <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-56 object-cover">
+                                <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                    <span class="text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">Ver Detalles</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <span class="text-sm text-teal-600 font-semibold">${template.category}</span>
+                                <h3 class="text-xl font-bold mt-2 mb-3">${template.name}</h3>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-2xl font-bold text-gray-800">$${template.price}</span>
+                                    <button class="view-details-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300" data-id="${template.id}">Ver más</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    templateGrid.innerHTML += templateCard;
+                });
+            };
+
+            // Función para mostrar el modal con los detalles de la plantilla
+            const showModal = (id) => {
+                const template = templates.find(t => t.id == id);
+                if (!template) return;
+
+                modalContent.innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-0">
+                        <div class="p-4 md:p-0">
+                            <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-full object-cover rounded-l-xl">
+                        </div>
+                        <div class="p-6 md:p-8 flex flex-col">
+                            <div>
+                                <span class="text-sm text-teal-600 font-semibold">${template.category}</span>
+                                <h2 class="text-3xl font-bold mt-2 mb-4">${template.name}</h2>
+                                <p class="text-gray-600 mb-6 flex-grow">${template.description}</p>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="flex justify-between items-center mb-6">
+                                    <span class="text-3xl font-bold text-gray-900">$${template.price}</span>
+                                </div>
+                                <button class="w-full bg-teal-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-600 transition duration-300">
+                                    Comprar Ahora
+                                </button>
+                                <button id="close-modal-btn" class="w-full mt-2 text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modal.classList.add('is-open');
+                document.body.style.overflow = 'hidden'; // Evitar scroll del fondo
+            };
+            
+            // Función para cerrar el modal
+            const closeModal = () => {
+                modal.classList.remove('is-open');
+                document.body.style.overflow = 'auto';
+            };
+
+            // Event Listeners
+            templateGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.group');
+                if (card) {
+                    showModal(card.dataset.id);
+                }
+            });
+
+            modal.addEventListener('click', (e) => {
+                // Cerrar si se hace clic en el fondo o en el botón de cerrar
+                if (e.target.id === 'template-modal' || e.target.id === 'close-modal-btn') {
+                    closeModal();
+                }
+            });
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Renderizar plantillas al cargar la página
+            renderTemplates();
+        });
+    </script>
+</body>
+</html>
