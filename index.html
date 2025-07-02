@@ -7,6 +7,8 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AeOPyU4Cpw12dZNby-3Y0aaLlfRdkalqPauVarGYzBmQON1K_gnpt20R656CxRhkdKsf4LlWxnLpL2De&currency=USD"></script>
+
     
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,27 +157,96 @@
             };
 
             // Función para mostrar el modal con los detalles y el botón de pago
-            const showModal = (id) => {
-                const template = templates.find(t => t.id == id);
-                if (!template) return;
+
+            // Función para mostrar el modal con los detalles y el botón de pago
+const showModal = (id) => {
+    const template = templates.find(t => t.id == id);
+    if (!template) return;
+
+    modalContent.innerHTML = `
+        <div class="grid md:grid-cols-2 gap-0">
+            <div class="p-4 md:p-0">
+                <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-full object-cover md:rounded-l-xl" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error';">
+            </div>
+            <div class="p-6 md:p-8 flex flex-col">
+                <div>
+                    <span class="text-sm text-teal-600 font-semibold">${template.category}</span>
+                    <h2 class="text-3xl font-bold mt-2 mb-4">${template.name}</h2>
+                    <p class="text-gray-600 mb-6 flex-grow">${template.description}</p>
+                </div>
+                <div class="mt-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-3xl font-bold text-gray-900">$${template.price}</span>
+                    </div>
+
+                    <!-- Contenedor para el botón de PayPal -->
+                    <div id="paypal-button-container"></div>
+
+                    <button id="close-modal-btn" class="w-full mt-4 text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+
+    // Renderizar botón de PayPal dinámico
+    setTimeout(() => {
+        paypal.Buttons({
+            style: {
+                layout: 'vertical',
+                color: 'blue',
+                shape: 'rect',
+                label: 'paypal'
+            },
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        description: template.name,
+                        amount: {
+                            value: template.price
+                        }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    alert('Pago completado por: ' + details.payer.name.given_name);
+                });
+            }
+        }).render('#paypal-button-container');
+    }, 150);
+};
+
 
                 modalContent.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-0">
-                        <div class="p-4 md:p-0">
-                             <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-full object-cover md:rounded-l-xl" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error';">
-                        </div>
-                        <div class="p-6 md:p-8 flex flex-col">
-                            <div>
-                                <span class="text-sm text-teal-600 font-semibold">${template.category}</span>
-                                <h2 class="text-3xl font-bold mt-2 mb-4">${template.name}</h2>
-                                <p class="text-gray-600 mb-6 flex-grow">${template.description}</p>
-                            </div>
-                            <div class="mt-auto">
-                                <div class="flex justify-between items-center mb-6">
-                                    <span class="text-3xl font-bold text-gray-900">$${template.price}</span>
-                                </div>
+  <div class="grid md:grid-cols-2 gap-0">
+    <div class="p-4 md:p-0">
+      <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-full object-cover md:rounded-l-xl" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error';">
+    </div>
+    <div class="p-6 md:p-8 flex flex-col">
+      <div>
+        <span class="text-sm text-teal-600 font-semibold">${template.category}</span>
+        <h2 class="text-3xl font-bold mt-2 mb-4">${template.name}</h2>
+        <p class="text-gray-600 mb-6 flex-grow">${template.description}</p>
+      </div>
+      <div class="mt-auto">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-3xl font-bold text-gray-900">$${template.price}</span>
+        </div>
+
+        <!-- Botón de PayPal dinámico -->
+        <div id="paypal-button-container"></div>
+
+        <button id="close-modal-btn" class="w-full mt-4 text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cerrar</button>
+      </div>
+    </div>
+  </div>
+`;
+
                                 
-                                <!-- Formulario de PayPal -->
+                        <!-- Formulario de PayPal -->
                                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
                                     <input type="hidden" name="cmd" value="_xclick">
                                     <input type="hidden" name="business" value="tucorreo@paypal.com"> <!-- CAMBIA ESTO POR TU CORREO DE PAYPAL -->
