@@ -30,15 +30,10 @@
         .modal {
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .modal-content {
-            transition: transform 0.3s ease;
-        }
+        /* FIX: Removed transform properties from the modal to prevent stacking context issues with the PayPal iframe. */
         .modal.is-open {
             opacity: 1;
             visibility: visible;
-        }
-        .modal.is-open .modal-content {
-            transform: translateY(0) scale(1);
         }
         html {
             scroll-behavior: smooth;
@@ -128,7 +123,8 @@
 
     <!-- Modal -->
     <div id="template-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[999] opacity-0 invisible">
-        <div id="modal-content" class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden transform -translate-y-10 scale-95">
+        <!-- FIX: Removed transform classes from this div to prevent CSS stacking issues -->
+        <div id="modal-content" class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden">
             <!-- Modal content will be populated by JS -->
         </div>
     </div>
@@ -143,6 +139,10 @@
             { id: 2, name: 'Plantilla de E-commerce "Orion"', category: 'Tienda Online', price: '79.99', description: 'Impulsa tus ventas con Orion. Un diseño limpio, centrado en el producto y optimizado para la conversión. Incluye carrito de compras y pasarela de pago.', imageUrl: 'https://placehold.co/600x400/0ea5e9/ffffff?text=Orion' },
             { id: 3, name: 'Plantilla de Portfolio "Crea"', category: 'Portfolio', price: '39.99', description: 'Muestra tu trabajo con estilo. Crea es una plantilla minimalista ideal para fotógrafos, diseñadores y artistas visuales.', imageUrl: 'https://placehold.co/600x400/6d28d9/ffffff?text=Crea' },
             { id: 4, name: 'Plantilla de Blog "Narrador"', category: 'Blog', price: '29.99', description: 'Engancha a tus lectores con un diseño enfocado en la legibilidad y la experiencia de usuario. Perfecta para bloggers de cualquier nicho.', imageUrl: 'https://placehold.co/600x400/db2777/ffffff?text=Narrador' },
+            { id: 5, name: 'Plantilla para App "Momentum"', category: 'Landing Page', price: '34.99', description: 'Una landing page de alta conversión para promocionar tu aplicación móvil. Destaca las características y consigue más descargas.', imageUrl: 'https://placehold.co/600x400/ea580c/ffffff?text=Momentum' },
+            { id: 6, name: 'Plantilla de Restaurante "Sabor"', category: 'Sitio Web', price: '45.00', description: 'Presenta tu menú, acepta reservas y atrae a más clientes con esta plantilla diseñada específicamente para restaurantes y cafés.', imageUrl: 'https://placehold.co/600x400/ca8a04/ffffff?text=Sabor' },
+            { id: 7, name: 'Plantilla para Dashboard "AdminPro"', category: 'Dashboard', price: '59.99', description: 'Un completo panel de administración con gráficos, tablas y componentes de UI para gestionar tu aplicación web de forma eficiente.', imageUrl: 'https://placehold.co/600x400/475569/ffffff?text=AdminPro' },
+            { id: 8, name: 'Plantilla para Inmobiliaria "Hogar"', category: 'Sitio Web', price: '55.00', description: 'Diseño profesional para agencias inmobiliarias. Muestra propiedades con galerías de imágenes, mapas y formularios de contacto.', imageUrl: 'https://placehold.co/600x400/059669/ffffff?text=Hogar' },
         ];
 
         // --- Lógica de la aplicación ---
@@ -205,16 +205,7 @@
                                 <div class="flex justify-between items-center mb-6">
                                     <span class="text-3xl font-bold text-gray-900">$${template.price}</span>
                                 </div>
-                                <div id="payment-container">
-                                    <div id="payment-options">
-                                        <div class="space-y-3">
-                                            <button id="pay-with-paypal-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">Pagar con PayPal</button>
-                                            <button id="pay-with-card-btn" class="w-full bg-gray-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-800 transition duration-300">Pagar con Tarjeta de Crédito/Débito</button>
-                                        </div>
-                                    </div>
-                                    <div id="paypal-button-container" class="hidden w-full z-10"></div>
-                                    <div id="card-form-container" class="hidden"></div>
-                                </div>
+                                <div id="paypal-button-container" class="w-full z-10 min-h-[100px]"></div>
                                 <button id="close-modal-btn" class="w-full mt-3 text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cerrar</button>
                             </div>
                         </div>
@@ -223,68 +214,38 @@
                 modal.classList.add('is-open');
                 document.body.style.overflow = 'hidden';
 
-                // Event listeners for payment options
-                document.getElementById('pay-with-paypal-btn').addEventListener('click', () => showPayPalButtons(template));
-                document.getElementById('pay-with-card-btn').addEventListener('click', () => showCardForm(template));
-            };
-
-            const showPayPalButtons = (template) => {
-                document.getElementById('payment-options').classList.add('hidden');
-                const paypalContainer = document.getElementById('paypal-button-container');
-                paypalContainer.classList.remove('hidden');
-                paypalContainer.innerHTML = ''; // Clear previous buttons
-
-                paypal.Buttons({
-                    createOrder: (data, actions) => actions.order.create({
-                        purchase_units: [{ description: template.name, amount: { value: template.price } }]
-                    }),
-                    onApprove: (data, actions) => actions.order.capture().then(details => {
-                        showMessage(`Pago completado por ${details.payer.name.given_name}. ¡Gracias!`);
-                        setTimeout(closeModal, 3000);
-                    }),
-                    onError: err => {
-                        console.error('Ocurrió un error con el pago de PayPal:', err);
-                        showMessage('Ocurrió un error con el pago.', 'error');
-                    }
-                }).render('#paypal-button-container');
-            };
-
-            const showCardForm = (template) => {
-                document.getElementById('payment-options').classList.add('hidden');
-                const cardFormContainer = document.getElementById('card-form-container');
-                cardFormContainer.classList.remove('hidden');
-                cardFormContainer.innerHTML = `
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-4" role="alert">
-                        <p class="font-bold">Modo de Demostración</p>
-                        <p class="text-sm">Este formulario es solo una demostración visual. No ingrese datos reales. Para aceptar pagos con tarjeta de forma segura, se requiere una integración con un proveedor como Stripe.</p>
-                    </div>
-                    <div class="space-y-3">
-                        <div>
-                            <label for="card-number" class="block text-sm font-medium text-gray-700">Número de Tarjeta</label>
-                            <input type="text" id="card-number" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" placeholder="•••• •••• •••• ••••">
-                        </div>
-                        <div>
-                            <label for="card-name" class="block text-sm font-medium text-gray-700">Nombre en la Tarjeta</label>
-                            <input type="text" id="card-name" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" placeholder="Juan Pérez">
-                        </div>
-                        <div class="flex space-x-3">
-                            <div class="w-1/2">
-                                <label for="card-expiry" class="block text-sm font-medium text-gray-700">Vencimiento</label>
-                                <input type="text" id="card-expiry" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" placeholder="MM/AA">
-                            </div>
-                            <div class="w-1/2">
-                                <label for="card-cvc" class="block text-sm font-medium text-gray-700">CVC</label>
-                                <input type="text" id="card-cvc" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" placeholder="123">
-                            </div>
-                        </div>
-                        <button class="w-full bg-teal-500 text-white font-bold py-3 rounded-lg opacity-50 cursor-not-allowed">Pagar $${template.price}</button>
-                        <button type="button" id="cancel-card-payment" class="w-full text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cancelar</button>
-                    </div>
-                `;
-                document.getElementById('cancel-card-payment').addEventListener('click', () => {
-                    cardFormContainer.classList.add('hidden');
-                    document.getElementById('payment-options').classList.remove('hidden');
-                });
+                // FIX: Added a defensive check to ensure the PayPal object is loaded before rendering buttons.
+                if (typeof paypal !== 'undefined') {
+                    paypal.Buttons({
+                        createOrder: (data, actions) => {
+                            return actions.order.create({
+                                purchase_units: [{
+                                    description: template.name,
+                                    amount: {
+                                        value: template.price
+                                    }
+                                }]
+                            });
+                        },
+                        onApprove: (data, actions) => {
+                            return actions.order.capture().then(details => {
+                                showMessage(`Pago completado por ${details.payer.name.given_name}. ¡Gracias!`);
+                                setTimeout(closeModal, 3000);
+                            });
+                        },
+                        onError: err => {
+                            console.error('Ocurrió un error con el pago de PayPal:', err);
+                            showMessage('Ocurrió un error con el pago.', 'error');
+                        }
+                    }).render('#paypal-button-container').catch(err => {
+                        // FIX: Added catch block for render errors.
+                        console.error('Error rendering PayPal Buttons:', err);
+                        document.getElementById('paypal-button-container').innerHTML = '<p class="text-red-500 text-center">Error al mostrar los botones de pago.</p>';
+                    });
+                } else {
+                    console.error('PayPal SDK is not loaded.');
+                    document.getElementById('paypal-button-container').innerHTML = '<p class="text-red-500 text-center">No se pudieron cargar las opciones de pago. Por favor, refresque la página.</p>';
+                }
             };
             
             const closeModal = () => {
