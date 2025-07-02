@@ -13,7 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- NOTA: El SDK de PayPal ya no se carga aquí, se cargará en la ventana emergente. -->
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AeOPyU4Cpw12dZNby-3Y0aaLlfRdkalqPauVarGYzBmQON1K_gnpt20R656CxRhkdKsf4LlWxnLpL2De&currency=USD"></script>
     
     <!-- Custom Styles -->
     <style>
@@ -26,10 +27,18 @@
             background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0);
             background-size: 20px 20px;
         }
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        /* FIX: Removed transform properties from the modal to prevent stacking context issues with the PayPal iframe. */
+        .modal.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
         html {
             scroll-behavior: smooth;
         }
-        /* Custom Message Box for notifications */
+        /* Custom Message Box */
         .message-box {
             position: fixed;
             top: -100px;
@@ -41,7 +50,6 @@
             z-index: 1000;
             transition: top 0.5s ease-in-out;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .message-box.success {
             background-color: #10B981; /* green-500 */
@@ -113,7 +121,13 @@
         </div>
     </footer>
 
-    <!-- MODAL REMOVED: The modal is no longer needed as the payment form will open in a new window. -->
+    <!-- Modal -->
+    <div id="template-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[999] opacity-0 invisible">
+        <!-- FIX: Removed transform classes from this div to prevent CSS stacking issues -->
+        <div id="modal-content" class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden">
+            <!-- Modal content will be populated by JS -->
+        </div>
+    </div>
 
     <!-- Custom Message Box -->
     <div id="message-box" class="message-box"></div>
@@ -134,8 +148,9 @@
         // --- Lógica de la aplicación ---
         document.addEventListener('DOMContentLoaded', () => {
             const templateGrid = document.getElementById('template-grid');
+            const modal = document.getElementById('template-modal');
+            const modalContent = document.getElementById('modal-content');
             
-            // Function to show notifications on the main page
             const showMessage = (text, type = 'success') => {
                 const messageBox = document.getElementById('message-box');
                 messageBox.textContent = text;
@@ -143,22 +158,8 @@
                 messageBox.classList.add('show');
                 setTimeout(() => {
                     messageBox.classList.remove('show');
-                }, 4000); // Increased duration
+                }, 3000);
             };
-
-            // Listen for messages from the popup window (e.g., payment status)
-            window.addEventListener('message', (event) => {
-                // Security check: only accept messages from a known origin or null (for popups)
-                if (event.origin !== window.location.origin && event.origin !== 'null') {
-                    console.warn(`Message from unexpected origin ignored: ${event.origin}`);
-                    return;
-                }
-
-                const { type, text, statusType } = event.data;
-                if (type === 'payment-status') {
-                    showMessage(text, statusType);
-                }
-            });
 
             const renderTemplates = () => {
                 templateGrid.innerHTML = '';
@@ -185,46 +186,14 @@
                 });
             };
 
-            // NEW: Function to open the payment form in a new window
-            const openPaymentWindow = (id) => {
+            const showModal = (id) => {
                 const template = templates.find(t => t.id == id);
                 if (!template) return;
 
-                const paymentWindow = window.open('', '_blank', 'width=850,height=650,scrollbars=yes,resizable=yes');
-                
-                if(!paymentWindow) {
-                    showMessage('Por favor, deshabilite el bloqueador de pop-ups para continuar con el pago.', 'error');
-                    return;
-                }
-
-                const paymentHtml = `
-                <!DOCTYPE html>
-                <html lang="es">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Pagar por ${template.name}</title>
-                    <script src="https://cdn.tailwindcss.com"></script>
-                    <link rel="preconnect" href="https://fonts.googleapis.com">
-                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-                    <script src="https://www.paypal.com/sdk/js?client-id=AeOPyU4Cpw12dZNby-3Y0aaLlfRdkalqPauVarGYzBmQON1K_gnpt20R656CxRhkdKsf4LlWxnLpL2De&currency=USD"></script>
-                    <style>
-                        body { 
-                            font-family: 'Inter', sans-serif; 
-                            background-color: #f8fafc; 
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            min-height: 100vh;
-                            padding: 1rem;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden grid md:grid-cols-2 gap-0">
+                modalContent.innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-0">
                         <div class="p-4 md:p-0">
-                            <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-full object-cover md:rounded-l-xl" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error';">
+                             <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-full object-cover md:rounded-l-xl" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error';">
                         </div>
                         <div class="p-6 md:p-8 flex flex-col">
                             <div>
@@ -237,83 +206,70 @@
                                     <span class="text-3xl font-bold text-gray-900">$${template.price}</span>
                                 </div>
                                 <div id="paypal-button-container" class="w-full z-10 min-h-[100px]"></div>
-                                <div id="payment-message" class="text-center mt-2 font-semibold"></div>
-                                <button onclick="window.close()" class="w-full mt-3 text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cerrar</button>
+                                <button id="close-modal-btn" class="w-full mt-3 text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cerrar</button>
                             </div>
                         </div>
                     </div>
-
-                    <script>
-                        const currentTemplate = ${JSON.stringify(template)};
-                        
-                        // Function to send a message back to the main window
-                        const notifyOpener = (text, statusType) => {
-                            if (window.opener && !window.opener.closed) {
-                                // Use '*' for targetOrigin for robustness in dynamic/sandboxed environments
-                                window.opener.postMessage({ type: 'payment-status', text, statusType }, '*');
-                            }
-                        }
-
-                        const paymentMessageEl = document.getElementById('payment-message');
-
-                        paypal.Buttons({
-                            createOrder: (data, actions) => {
-                                return actions.order.create({
-                                    purchase_units: [{
-                                        description: currentTemplate.name,
-                                        amount: { value: currentTemplate.price }
-                                    }]
-                                });
-                            },
-                            onApprove: (data, actions) => {
-                                return actions.order.capture().then(details => {
-                                    // FIX: Use string concatenation to avoid syntax errors with nested template literals.
-                                    const message = 'Pago completado por ' + details.payer.name.given_name + '. ¡Gracias!';
-                                    paymentMessageEl.textContent = message;
-                                    paymentMessageEl.style.color = '#10B981';
-                                    notifyOpener(message, 'success');
-                                    setTimeout(() => window.close(), 3000);
-                                });
-                            },
-                            onError: err => {
-                                console.error('Ocurrió un error con el pago de PayPal:', err);
-                                const message = 'Ocurrió un error con el pago.';
-                                paymentMessageEl.textContent = message;
-                                paymentMessageEl.style.color = '#EF4444';
-                                notifyOpener(message, 'error');
-                            }
-                        }).render('#paypal-button-container').catch(err => {
-                            console.error('Error rendering PayPal Buttons:', err);
-                            const errorContainer = document.getElementById('paypal-button-container');
-                            errorContainer.innerHTML = '<p class="text-red-500 text-center">Error al mostrar los botones de pago.</p>';
-                        });
-                    </script>
-                </body>
-                </html>
                 `;
+                modal.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
 
-                paymentWindow.document.write(paymentHtml);
-                paymentWindow.document.close();
+                // FIX: Added a defensive check to ensure the PayPal object is loaded before rendering buttons.
+                if (typeof paypal !== 'undefined') {
+                    paypal.Buttons({
+                        createOrder: (data, actions) => {
+                            return actions.order.create({
+                                purchase_units: [{
+                                    description: template.name,
+                                    amount: {
+                                        value: template.price
+                                    }
+                                }]
+                            });
+                        },
+                        onApprove: (data, actions) => {
+                            return actions.order.capture().then(details => {
+                                showMessage(`Pago completado por ${details.payer.name.given_name}. ¡Gracias!`);
+                                setTimeout(closeModal, 3000);
+                            });
+                        },
+                        onError: err => {
+                            console.error('Ocurrió un error con el pago de PayPal:', err);
+                            showMessage('Ocurrió un error con el pago.', 'error');
+                        }
+                    }).render('#paypal-button-container').catch(err => {
+                        // FIX: Added catch block for render errors.
+                        console.error('Error rendering PayPal Buttons:', err);
+                        document.getElementById('paypal-button-container').innerHTML = '<p class="text-red-500 text-center">Error al mostrar los botones de pago.</p>';
+                    });
+                } else {
+                    console.error('PayPal SDK is not loaded.');
+                    document.getElementById('paypal-button-container').innerHTML = '<p class="text-red-500 text-center">No se pudieron cargar las opciones de pago. Por favor, refresque la página.</p>';
+                }
             };
             
+            const closeModal = () => {
+                modal.classList.remove('is-open');
+                document.body.style.overflow = 'auto';
+            };
+
             templateGrid.addEventListener('click', (e) => {
-                // Find the card or the button that was clicked
-                const targetElement = e.target.closest('.group, .view-details-btn');
-                if (targetElement) {
-                    // Get the id from the data attribute
-                    const id = targetElement.dataset.id || targetElement.closest('.group').dataset.id;
-                    openPaymentWindow(id);
+                const card = e.target.closest('.group');
+                if (card) showModal(card.dataset.id);
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target.id === 'template-modal' || e.target.id === 'close-modal-btn') {
+                    closeModal();
                 }
             });
             
-            // Mobile menu toggle
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
             });
 
-            // Initial render of templates
             renderTemplates();
         });
     </script>
