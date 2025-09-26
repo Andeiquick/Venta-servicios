@@ -3,274 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plantillas Pro - Tu Tienda de Plantillas</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Removedor de Fondo con CSS (Simulación)</title>
+    <!-- Carga de Tailwind CSS para un diseño limpio y responsivo -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AV1e708ccYEELi37tkatUI1PSM31xWd1ZMSoiz9t45eEgHbGbjOhqJf9Jh_8Q_1giupoSTjVHBJ0Q1gC&currency=USD"></script>
-    
-    <!-- Custom Styles -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-        .hero-bg {
-            background-color: #111827;
-            background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0);
+        /* Configuración de color para el tablero de ajedrez que simula la transparencia */
+        .checkerboard-bg {
+            background-image: 
+                linear-gradient(45deg, #ddd 25%, transparent 25%),
+                linear-gradient(-45deg, #ddd 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ddd 75%),
+                linear-gradient(-45deg, transparent 75%, #ddd 75%);
             background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
-        .modal {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        /* FIX: Removed transform properties from the modal to prevent stacking context issues with the PayPal iframe. */
-        .modal.is-open {
-            opacity: 1;
-            visibility: visible;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        /* Custom Message Box */
-        .message-box {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 1rem 2rem;
-            border-radius: 0.5rem;
-            color: white;
-            z-index: 1000;
-            transition: top 0.5s ease-in-out;
-            font-weight: 600;
-        }
-        .message-box.success {
-            background-color: #10B981; /* green-500 */
-        }
-        .message-box.error {
-            background-color: #EF4444; /* red-500 */
-        }
-        .message-box.show {
-            top: 20px;
+
+        /* La imagen procesada usa un filtro CSS para intentar "blanquear" */
+        /* Esto SOLO es efectivo en imágenes con fondos de color sólido, especialmente blanco. */
+        .processed-image {
+            /* Intentamos usar mix-blend-mode para simular que el fondo blanco desaparece */
+            mix-blend-mode: multiply; /* Esto hará transparente el color blanco/claro */
+            filter: drop-shadow(0 0 1px rgba(0,0,0,0.1)); /* Pequeña sombra para que se note */
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8 font-sans">
 
-    <!-- Header -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-teal-600">PlantillasPro</a>
-            <div class="hidden md:flex space-x-6 items-center">
-                <a href="#inicio" class="text-gray-600 hover:text-teal-600 transition duration-300">Inicio</a>
-                <a href="#plantillas" class="text-gray-600 hover:text-teal-600 transition duration-300">Plantillas</a>
-                <a href="#" class="bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-600 transition duration-300">Contacto</a>
-            </div>
-            <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
-        </nav>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
-            <a href="#inicio" class="block py-2 text-gray-600 hover:text-teal-600">Inicio</a>
-            <a href="#plantillas" class="block py-2 text-gray-600 hover:text-teal-600">Plantillas</a>
-            <a href="#" class="block mt-2 bg-teal-500 text-white text-center py-2 px-4 rounded-lg hover:bg-teal-600">Contacto</a>
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-800 mb-4 text-center">
+            Removedor de Fondo (Simulación CSS)
+        </h1>
+        <p class="text-gray-600 mb-8 text-center">
+            Aviso: CSS no puede quitar fondos complejos automáticamente. Esta es una demostración de filtros CSS. Funciona mejor en imágenes con fondos de color blanco o sólido.
+        </p>
+
+        <!-- Selector de Archivo -->
+        <div class="mb-8 text-center">
+            <label for="image-upload" class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 cursor-pointer transition duration-300 shadow-md">
+                Seleccionar Imagen
+            </label>
+            <input type="file" id="image-upload" accept="image/*" class="hidden">
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section id="inicio" class="hero-bg text-white py-20 md:py-32">
-            <div class="container mx-auto px-6 text-center">
-                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">Diseños Profesionales al Instante</h1>
-                <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto">Acelera tu flujo de trabajo con nuestra colección de plantillas premium, listas para usar y personalizar.</p>
-                <a href="#plantillas" class="bg-teal-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-600 transition duration-300 text-lg">Explorar Plantillas</a>
-            </div>
-        </section>
-
-        <!-- Templates Section -->
-        <section id="plantillas" class="py-16 md:py-24">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Nuestro Catálogo</h2>
-                <div id="template-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    <!-- Las plantillas se insertarán aquí dinámicamente -->
+        
+        <!-- Previsualizaciones de Imágenes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Imagen Original -->
+            <div class="p-4 border border-gray-200 rounded-lg shadow-inner">
+                <h2 class="text-xl font-bold mb-3 text-gray-700">Original</h2>
+                <div class="bg-gray-200 h-64 flex items-center justify-center rounded-md overflow-hidden">
+                    <img id="original-image" src="#" alt="Imagen Original" class="max-h-full max-w-full object-contain transition duration-500" style="display: none;">
+                    <p id="original-placeholder" class="text-gray-500">Carga una imagen</p>
                 </div>
             </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2024 PlantillasPro. Todos los derechos reservados.</p>
-            <div class="flex justify-center space-x-4 mt-4">
-                <a href="#" class="text-gray-400 hover:text-white">Facebook</a>
-                <a href="#" class="text-gray-400 hover:text-white">Twitter</a>
-                <a href="#" class="text-gray-400 hover:text-white">Instagram</a>
+            
+            <!-- Imagen Procesada (Simulación) -->
+            <div class="p-4 border-4 border-dashed border-red-400 rounded-lg shadow-xl">
+                <h2 class="text-xl font-bold mb-3 text-red-600">Fondo "Removido" (CSS)</h2>
+                <div class="relative h-64 rounded-md overflow-hidden">
+                    <!-- Fondo de tablero para simular transparencia -->
+                    <div class="checkerboard-bg absolute inset-0 z-10"></div>
+                    
+                    <!-- Imagen con el filtro CSS aplicado -->
+                    <img id="processed-image" src="#" alt="Imagen Procesada" class="processed-image absolute inset-0 w-full h-full object-contain z-20 transition duration-500" style="display: none;">
+                    <p id="processed-placeholder" class="text-gray-500 absolute inset-0 flex items-center justify-center z-30">Se aplicará un filtro...</p>
+                </div>
             </div>
-        </div>
-    </footer>
-
-    <!-- Modal -->
-    <div id="template-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[999] opacity-0 invisible">
-        <!-- FIX: Removed transform classes from this div to prevent CSS stacking issues -->
-        <div id="modal-content" class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden">
-            <!-- Modal content will be populated by JS -->
         </div>
     </div>
 
-    <!-- Custom Message Box -->
-    <div id="message-box" class="message-box"></div>
-
     <script>
-        // --- Base de datos de plantillas (simulada) ---
-        const templates = [
-            { id: 1, name: 'Plantilla Corporativa "Nexus"', category: 'Sitio Web', price: '49.99', description: 'Una plantilla elegante y moderna perfecta para empresas de tecnología, startups y agencias. Totalmente responsiva y fácil de personalizar.', imageUrl: 'https://placehold.co/600x400/16a34a/ffffff?text=Nexus' },
-            { id: 2, name: 'Plantilla de E-commerce "Orion"', category: 'Tienda Online', price: '79.99', description: 'Impulsa tus ventas con Orion. Un diseño limpio, centrado en el producto y optimizado para la conversión. Incluye carrito de compras y pasarela de pago.', imageUrl: 'https://placehold.co/600x400/0ea5e9/ffffff?text=Orion' },
-            { id: 3, name: 'Plantilla de Portfolio "Crea"', category: 'Portfolio', price: '39.99', description: 'Muestra tu trabajo con estilo. Crea es una plantilla minimalista ideal para fotógrafos, diseñadores y artistas visuales.', imageUrl: 'https://placehold.co/600x400/6d28d9/ffffff?text=Crea' },
-            { id: 4, name: 'Plantilla de Blog "Narrador"', category: 'Blog', price: '29.99', description: 'Engancha a tus lectores con un diseño enfocado en la legibilidad y la experiencia de usuario. Perfecta para bloggers de cualquier nicho.', imageUrl: 'https://placehold.co/600x400/db2777/ffffff?text=Narrador' },
-            { id: 5, name: 'Plantilla para App "Momentum"', category: 'Landing Page', price: '34.99', description: 'Una landing page de alta conversión para promocionar tu aplicación móvil. Destaca las características y consigue más descargas.', imageUrl: 'https://placehold.co/600x400/ea580c/ffffff?text=Momentum' },
-            { id: 6, name: 'Plantilla de Restaurante "Sabor"', category: 'Sitio Web', price: '45.00', description: 'Presenta tu menú, acepta reservas y atrae a más clientes con esta plantilla diseñada específicamente para restaurantes y cafés.', imageUrl: 'https://placehold.co/600x400/ca8a04/ffffff?text=Sabor' },
-            { id: 7, name: 'Plantilla para Dashboard "AdminPro"', category: 'Dashboard', price: '59.99', description: 'Un completo panel de administración con gráficos, tablas y componentes de UI para gestionar tu aplicación web de forma eficiente.', imageUrl: 'https://placehold.co/600x400/475569/ffffff?text=AdminPro' },
-            { id: 8, name: 'Plantilla para Inmobiliaria "Hogar"', category: 'Sitio Web', price: '55.00', description: 'Diseño profesional para agencias inmobiliarias. Muestra propiedades con galerías de imágenes, mapas y formularios de contacto.', imageUrl: 'https://placehold.co/600x400/059669/ffffff?text=Hogar' },
-        ];
+        // Variables del DOM
+        const fileInput = document.getElementById('image-upload');
+        const originalImage = document.getElementById('original-image');
+        const processedImage = document.getElementById('processed-image');
+        const originalPlaceholder = document.getElementById('original-placeholder');
+        const processedPlaceholder = document.getElementById('processed-placeholder');
 
-        // --- Lógica de la aplicación ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const templateGrid = document.getElementById('template-grid');
-            const modal = document.getElementById('template-modal');
-            const modalContent = document.getElementById('modal-content');
-            
-            const showMessage = (text, type = 'success') => {
-                const messageBox = document.getElementById('message-box');
-                messageBox.textContent = text;
-                messageBox.className = `message-box ${type}`;
-                messageBox.classList.add('show');
-                setTimeout(() => {
-                    messageBox.classList.remove('show');
-                }, 3000);
-            };
+        // Función para cargar la imagen cuando el usuario selecciona un archivo
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageUrl = e.target.result;
 
-            const renderTemplates = () => {
-                templateGrid.innerHTML = '';
-                templates.forEach(template => {
-                    const templateCard = `
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer group" data-id="${template.id}">
-                            <div class="relative">
-                                <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error';">
-                                <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
-                                    <span class="text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">Ver Detalles</span>
-                                </div>
-                            </div>
-                            <div class="p-6">
-                                <span class="text-sm text-teal-600 font-semibold">${template.category}</span>
-                                <h3 class="text-xl font-bold mt-2 mb-3">${template.name}</h3>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-2xl font-bold text-gray-800">$${template.price}</span>
-                                    <button class="view-details-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300" data-id="${template.id}">Ver más</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    templateGrid.innerHTML += templateCard;
-                });
-            };
+                    // Muestra la imagen original
+                    originalImage.src = imageUrl;
+                    originalImage.style.display = 'block';
+                    originalPlaceholder.style.display = 'none';
 
-            const showModal = (id) => {
-                const template = templates.find(t => t.id == id);
-                if (!template) return;
-
-                modalContent.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-0">
-                        <div class="p-4 md:p-0">
-                             <img src="${template.imageUrl}" alt="${template.name}" class="w-full h-full object-cover md:rounded-l-xl" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error';">
-                        </div>
-                        <div class="p-6 md:p-8 flex flex-col">
-                            <div>
-                                <span class="text-sm text-teal-600 font-semibold">${template.category}</span>
-                                <h2 class="text-3xl font-bold mt-2 mb-4">${template.name}</h2>
-                                <p class="text-gray-600 mb-6 flex-grow">${template.description}</p>
-                            </div>
-                            <div class="mt-auto">
-                                <div class="flex justify-between items-center mb-6">
-                                    <span class="text-3xl font-bold text-gray-900">$${template.price}</span>
-                                </div>
-                                <div id="paypal-button-container" class="w-full z-10 min-h-[100px]"></div>
-                                <button id="close-modal-btn" class="w-full mt-3 text-center text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition duration-300">Cerrar</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                modal.classList.add('is-open');
-                document.body.style.overflow = 'hidden';
-
-                // FIX: Added a defensive check to ensure the PayPal object is loaded before rendering buttons.
-                if (typeof paypal !== 'undefined') {
-                    paypal.Buttons({
-                        createOrder: (data, actions) => {
-                            return actions.order.create({
-                                purchase_units: [{
-                                    description: template.name,
-                                    amount: {
-                                        value: template.price
-                                    }
-                                }]
-                            });
-                        },
-                        onApprove: (data, actions) => {
-                            return actions.order.capture().then(details => {
-                                showMessage(`Pago completado por ${details.payer.name.given_name}. ¡Gracias!`);
-                                setTimeout(closeModal, 3000);
-                            });
-                        },
-                        onError: err => {
-                            console.error('Ocurrió un error con el pago de PayPal:', err);
-                            showMessage('Ocurrió un error con el pago.', 'error');
-                        }
-                    }).render('#paypal-button-container').catch(err => {
-                        // FIX: Added catch block for render errors.
-                        console.error('Error rendering PayPal Buttons:', err);
-                        document.getElementById('paypal-button-container').innerHTML = '<p class="text-red-500 text-center">Error al mostrar los botones de pago.</p>';
-                    });
-                } else {
-                    console.error('PayPal SDK is not loaded.');
-                    document.getElementById('paypal-button-container').innerHTML = '<p class="text-red-500 text-center">No se pudieron cargar las opciones de pago. Por favor, refresque la página.</p>';
-                }
-            };
-            
-            const closeModal = () => {
-                modal.classList.remove('is-open');
-                document.body.style.overflow = 'auto';
-            };
-
-            templateGrid.addEventListener('click', (e) => {
-                const card = e.target.closest('.group');
-                if (card) showModal(card.dataset.id);
-            });
-
-            modal.addEventListener('click', (e) => {
-                if (e.target.id === 'template-modal' || e.target.id === 'close-modal-btn') {
-                    closeModal();
-                }
-            });
-            
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-
-            renderTemplates();
+                    // Muestra la imagen procesada
+                    processedImage.src = imageUrl;
+                    processedImage.style.display = 'block';
+                    processedPlaceholder.style.display = 'none';
+                };
+                // Lee el archivo como una URL de datos (Base64)
+                reader.readAsDataURL(file);
+            }
         });
     </script>
 </body>
