@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Removedor de Fondo con CSS (Simulación)</title>
+    <title>Removedor de Fondo con CSS y JS</title>
     <!-- Carga de Tailwind CSS para un diseño limpio y responsivo -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Configuración de color para el tablero de ajedrez que simula la transparencia */
+        /* Estilos CSS para el fondo de tablero de ajedrez (simula la transparencia) */
         .checkerboard-bg {
             background-image: 
                 linear-gradient(45deg, #ddd 25%, transparent 25%),
@@ -18,12 +18,12 @@
             background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
 
-        /* La imagen procesada usa un filtro CSS para intentar "blanquear" */
-        /* Esto SOLO es efectivo en imágenes con fondos de color sólido, especialmente blanco. */
+        /* La imagen procesada usa filtros CSS (limitado para remover fondos) */
         .processed-image {
-            /* Intentamos usar mix-blend-mode para simular que el fondo blanco desaparece */
-            mix-blend-mode: multiply; /* Esto hará transparente el color blanco/claro */
-            filter: drop-shadow(0 0 1px rgba(0,0,0,0.1)); /* Pequeña sombra para que se note */
+            /* Usamos mix-blend-mode para simular que el fondo blanco se "multiplica" */
+            /* Esto hace que el color blanco o muy claro se vuelva transparente sobre el fondo de tablero */
+            mix-blend-mode: multiply; 
+            filter: drop-shadow(0 0 1px rgba(0,0,0,0.1)); 
         }
     </style>
 </head>
@@ -31,14 +31,15 @@
 
     <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-800 mb-4 text-center">
-            Removedor de Fondo (Simulación CSS)
+            Removedor de Fondo con JS (Simulación)
         </h1>
         <p class="text-gray-600 mb-8 text-center">
-            Aviso: CSS no puede quitar fondos complejos automáticamente. Esta es una demostración de filtros CSS. Funciona mejor en imágenes con fondos de color blanco o sólido.
+            **Funcionalidad JavaScript:** Permite cargar y mostrar la imagen. **Limitación:** La remoción de fondo se simula con filtros CSS.
         </p>
 
         <!-- Selector de Archivo -->
         <div class="mb-8 text-center">
+            <!-- Etiqueta con estilo de botón para el input de tipo file -->
             <label for="image-upload" class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 cursor-pointer transition duration-300 shadow-md">
                 Seleccionar Imagen
             </label>
@@ -72,6 +73,7 @@
         </div>
     </div>
 
+    <!-- Bloque JavaScript para la funcionalidad de la aplicación -->
     <script>
         // Variables del DOM
         const fileInput = document.getElementById('image-upload');
@@ -80,25 +82,31 @@
         const originalPlaceholder = document.getElementById('original-placeholder');
         const processedPlaceholder = document.getElementById('processed-placeholder');
 
-        // Función para cargar la imagen cuando el usuario selecciona un archivo
+        /**
+         * Maneja la carga de la imagen cuando el usuario selecciona un archivo.
+         * Usa FileReader para convertir el archivo a una URL de datos (Base64).
+         */
         fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
+                
+                // Función que se ejecuta cuando el archivo se ha cargado correctamente
                 reader.onload = function(e) {
                     const imageUrl = e.target.result;
 
-                    // Muestra la imagen original
+                    // 1. Muestra la imagen original
                     originalImage.src = imageUrl;
                     originalImage.style.display = 'block';
                     originalPlaceholder.style.display = 'none';
 
-                    // Muestra la imagen procesada
+                    // 2. Muestra la imagen procesada (con el filtro CSS)
                     processedImage.src = imageUrl;
                     processedImage.style.display = 'block';
                     processedPlaceholder.style.display = 'none';
                 };
-                // Lee el archivo como una URL de datos (Base64)
+                
+                // Inicia la lectura del archivo
                 reader.readAsDataURL(file);
             }
         });
